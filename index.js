@@ -1,28 +1,40 @@
-var express = require('express')
-var app = express()
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/express-api');
 
-// app.get('/', function (req, res) {
-//   var page = '<html>' + '<body>' + '<h1>Index.html</h1>' +'</body>' + '</html>'
-//   res.send(page)
-//   console.log(page)
-// })
-app.get('/about', function (req, res) {
-  var page = '<html>' + '<body>' + '</body>' + '</html>'
-  res.send(page)
-  console.log('Hello ppp')
-})
+var db = mongoose.connection
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('ok!')
+  var personSchema = mongoose.Schema(
+    {name: String,
+    password:String,
+    age:String
+    },
+    {timestamps:true}
+)
+  var person = mongoose.model('humen', personSchema);
 
-app.get('/:name', function (req, res) {
-  var username =req.params.name
-  var page = '<html>' + '<body>' + '<h1>'+ username +' de car '+ '</h1>' +'</body>' + '</html>'
-  res.send(page)
-  console.log(req)
-})
-app.post('/:name', function (req, res) {
+  var frank = new person({ name: 'fran',password:'123asd',age:'100'});
 
-  res.send("a POST request received" + req.params.name)
-  console.log('Hello ppp')
-})
-app.listen(3000,function(){
-  console.log('running on port 3000...please visit http://localhost:3000')
-})
+    console.log(frank.name);
+
+    // frank.save()
+
+    // frank.name = 'mike'
+    // frank.password = '000000'
+    // frank.age ='400'
+    // frank.save()
+
+    person.findById({_id:'57ecc8eb8d52f60559de08a6'},function(err,user){
+      // user.name= 'oooopopo'
+      user.remove(function(err){
+        console.log('delete')
+        person.find().exec(function(err, persons) {
+         // 异步执行
+         console.log(persons);
+       });
+      })
+    })
+
+
+});
